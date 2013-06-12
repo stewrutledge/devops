@@ -34,4 +34,4 @@ def kickstart(hostname=None):
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='10.50.255.12')
+    app.run()
