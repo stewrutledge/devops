@@ -1,0 +1,57 @@
+# Kickstart file for RedHat Enterprise Linux 6/CentOS
+#
+# Static LVM name, vg_system, on system drive. Configuration of basic services.
+# Automtic setup of system drive, ntp, syadmins, repositories and more.
+
+# To be built with via a jinja renderer (for example with flask)
+
+install
+text
+cdrom
+lang en_US.UTF-8
+keyboard sv-latin1
+network --onboot yes --device eth0 --bootproto static --ip {{ ipaddress }} --netmask {{ subnet }} --gateway {{ gateway }} --noipv6 --nameserver {{ nameserver }} --hostname {{ hostname }}
+rootpw  --iscrypted {{ root_pw }}
+firewall --enabled --service=ssh --service=ntp --port=161:udp --port=123:udp
+authconfig --enableshadow --passalgo=sha512
+selinux --permissive
+#firewall --enabled
+timezone --utc Europe/Stockholm
+
+# Storage block
+{%- block storage %}
+{% include "storage_%s.template" % storage_profile %}
+{%- endblock storage %}
+
+{%- block repos %}
+{% include "repo_%s.template" % repo_profile %}
+{%- endblock repos %}
+
+# Packages block
+%packages
+
+{%- block packages %}
+{% include "packages_%s.template" % package_profile %}
+{%- endblock packages %}
+
+%end
+
+%post
+# Registration block
+{%- if reg_profile %}
+{%- block reg %}
+{% include "reg_%s.template" % reg_profile %}
+{%- endblock reg %}
+{%- endif %}
+
+# Config block
+{%- block config %}
+{% include "config_%s.template" % config_profile %}
+{%- endblock config %}
+
+# Extras block
+{%- block extras %}
+{% include "extras_%s.template" % extras_profile %}
+{%- endblock extras %}
+
+%end

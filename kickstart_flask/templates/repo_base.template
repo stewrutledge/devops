@@ -1,0 +1,1 @@
+repo --name=MariaDB --baseurl=http://yum.mariadb.org/5.5/centos6-amd64

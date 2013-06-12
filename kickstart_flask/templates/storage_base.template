@@ -1,0 +1,13 @@
+bootloader --location=mbr --driveorder=sda --append="crashkernel=auto rhgb"
+zerombr yes
+ignoredisk --only-use=sda
+clearpart --all --initlabel
+part /boot --fstype=ext4 --size=500
+part pv.008002 --grow --asprimary --size=500
+
+volgroup vg_system --pesize=4096 pv.008002
+logvol / --fstype=ext4 --name=root --vgname=vg_system --size=4096
+logvol swap --name=swap --vgname=vg_system --size=1024
+logvol /tmp --fstype=ext4 --name=tmp --vgname=vg_system --size=1024
+logvol /var --fstype=ext4 --name=var --vgname=vg_system --size=1024
+

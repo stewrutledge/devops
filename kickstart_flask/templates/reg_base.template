@@ -1,0 +1,3 @@
+echo "registering with redhat using certificate method"
+subscription-manager register --username=MYUSER --password=MYPASSWORD --autosubscribe
+rhnreg_ks --username=MYUSER --password=MYPASSWORD --profilename={{ hostname }} --use-eus-channel --force
