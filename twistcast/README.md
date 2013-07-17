@@ -2,7 +2,10 @@
 
 A simple twisted based client/server setup for broadcasting messages to gnomes notify service
 Currently calls the binary for notify-send on the client side, this is obviously suboptimal but it reduces the dependencies in python to just twisted.
-The server itself listens for python dicts in the format of {'msg':'text to broadcast','queues':['list', 'of', 'queues']}
+The server itself listens for python dicts in the format of: 
+```python
+{'msg':'text to broadcast','queues':['list', 'of', 'queues']}
+```
 
 ## Server
 The server listens for connections, and when made assigns a 24 character random id to every client. If connecting via telnet, a message needs to first be sent to initialize this connection and get assigned an id.
@@ -10,9 +13,9 @@ The server listens for connections, and when made assigns a 24 character random 
 
 
 For the sake of integrating other applications (for example nagios warnings) you can skip the initialization phase by entering a key:
-
-> {'msg':'SERVER DONE BROKE','queues':['nagios'], 'key':'1234'}
-
+```python
+{'msg':'SERVER DONE BROKE','queues':['nagios'], 'key':'1234'}
+```
 This will bypass the assignment of and ID and simply broadcast a message to all connected clients.
 
 ## Client
