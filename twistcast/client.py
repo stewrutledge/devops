@@ -24,10 +24,6 @@ class Nagios(LineReceiver):
             call(['notify-send', data])
 
 
-def gotProtocol(p):
-    p.sendMessage("{'msg':'ack','queues':['nagios','test']}")
-
 point = TCP4ClientEndpoint(reactor, "localhost", 1234)
 d = connectProtocol(point, Nagios())
-d.addCallback(gotProtocol)
 reactor.run()
