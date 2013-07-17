@@ -28,7 +28,6 @@ class Notify(LineReceiver):
 
     def set_id(self, queues):
         client_id = self.gen_client_id()
-        self.sendLine("Connection made. Client id: %s" % (client_id,))
         self.client_id = client_id
         self.clients[client_id] = self
         for queue in queues:
@@ -37,30 +36,42 @@ class Notify(LineReceiver):
         for queue in queues:
             self.queues[queue].append(client_id)
         self.state = "INITIALIZED"
+        self.sendLine("You have been connected with cliend id: %s" % client_id)
+        return client_id
 
     def lineReceived(self, line):
-        elements = literal_eval(line)
         try:
-            elements['key']
-        except KeyError:
-            key = ""
+            elements = literal_eval(line)
+        except:
+            if self.state == 'INITIAL':
+                self.sendLine("Please register your client: %s"
+                              % str("{'msg':'REGISTER', 'queues':"
+                                    "['queues', 'to', 'join']}"))
+            else:
+                self.sendLine("Please send a valid python dict. Example: %s"
+                              % str("{'msg':'Danger!', 'queues':['nagios']}"))
         else:
-            key = elements['key']
-        queues = elements['queues']
-        msg = elements['msg']
-        if key == '1234':
-            self.broadcast(msg, queues)
-        if self.state == 'INITIAL' and key != '1234':
-            self.set_id(queues)
-        else:
-            self.broadcast(msg, queues)
+            try:
+                elements['key']
+            except KeyError:
+                key = ""
+            else:
+                key = elements['key']
+            queues = elements['queues']
+            msg = elements['msg']
+            if key == '1234':
+                self.broadcast(msg, queues, key=True)
+            if self.state == 'INITIAL' and key != '1234':
+                self.set_id(queues)
+            elif msg != 'REGISTER':
+                self.broadcast(msg, queues)
 
-    def broadcast(self, message, queues):
+    def broadcast(self, message, queues, key=False):
         for client_id, protocol in self.clients.iteritems():
             for queue in queues:
                 to_list = []
                 for client in self.queues[queue]:
-                    if self.clients[client] != self:
+                    if self.clients[client] != self or key is True:
                         to_list.append(self.clients[client])
         for to in to_list:
             to.sendLine(message)

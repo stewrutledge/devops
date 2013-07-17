@@ -12,13 +12,14 @@ class Nagios(LineReceiver):
         self.state = "initialize"
 
     def connectionMade(self):
-        self.sendLine("{'msg':'ack','queues':['nagios']}")
+        self.sendLine("{'msg':'INT','queues':['nagios']}")
         call(['notify-send', 'Connection made'])
 
     def dataReceived(self, data):
         if self.state == "initialize":
-            self.sendLine("{'msg':'ack','queues':['nagios']}")
+            self.sendLine("{'msg':'REGISTER','queues':['nagios']}")
             self.state = "initialized"
+            call(['notify-send', data])
         else:
             call(['notify-send', data])
 
