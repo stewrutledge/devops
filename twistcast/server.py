@@ -22,6 +22,9 @@ class Notify(LineReceiver):
     def connectionLost(self, reason):
         if self.client_id in self.clients:
             del self.clients[self.client_id]
+        for queue in self.queues:
+            if self.client_id in self.queues[queue]:
+                self.queues[queue].remove(self.client_id)
 
     def set_id(self, queues):
         client_id = self.gen_client_id()
