@@ -12,19 +12,19 @@ class Nagios(LineReceiver):
         self.state = "initialize"
 
     def connectionMade(self):
-        self.sendLine("ACK")
+        self.sendLine("{'msg':'ack','queues':['nagios']}")
         call(['notify-send', 'Connection made'])
 
     def dataReceived(self, data):
         if self.state == "initialize":
-            self.sendLine("ACK")
+            self.sendLine("{'msg':'ack','queues':['nagios']}")
             self.state = "initialized"
         else:
             call(['notify-send', data])
 
 
 def gotProtocol(p):
-    p.sendMessage("ACK")
+    p.sendMessage("{'msg':'ack','queues':['nagios','test']}")
 
 point = TCP4ClientEndpoint(reactor, "localhost", 1234)
 d = connectProtocol(point, Nagios())
