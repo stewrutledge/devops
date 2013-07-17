@@ -6,7 +6,7 @@ from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
 from subprocess import call
 
 
-class Nagios(LineReceiver):
+class Notify(LineReceiver):
 
     def __init__(self):
         self.state = "initialize"
@@ -25,5 +25,5 @@ class Nagios(LineReceiver):
 
 
 point = TCP4ClientEndpoint(reactor, "localhost", 1234)
-d = connectProtocol(point, Nagios())
+d = connectProtocol(point, Notify())
 reactor.run()
