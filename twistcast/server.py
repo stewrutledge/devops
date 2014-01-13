@@ -57,14 +57,17 @@ class Notify(LineReceiver):
                 key = ""
             else:
                 key = elements['key']
-            queues = elements['queues']
-            msg = elements['msg']
-            if key == '1234':
-                self.broadcast(msg, queues, key=True)
-            if self.state == 'INITIAL' and key != '1234':
-                self.set_id(queues)
-            elif msg != 'REGISTER':
-                self.broadcast(msg, queues)
+            try:
+                queues = elements['queues']
+                msg = elements['msg']
+                if key == '1234':
+                    self.broadcast(msg, queues, key=True)
+                if self.state == 'INITIAL' and key != '1234':
+                    self.set_id(queues)
+                elif msg != 'REGISTER':
+                    self.broadcast(msg, queues)
+            except Exception as e:
+                self.sendLine("Error parsing message: %s" % e)
 
     def broadcast(self, message, queues, key=False):
         for client_id, protocol in self.clients.iteritems():
@@ -86,7 +89,14 @@ class NotifyFactory(protocol.Factory):
     def buildProtocol(self, addr):
         return Notify(self.clients, self.queues)
 
+    def makeConnection(self, addr):
+        return Notify(self.clients, self.queues)
+
+    def datagramReceived(self, addr, message):
+        return Notify(self.clients, self.queues)
+
 port = 1234
 reactor.listenTCP(port, NotifyFactory())
+reactor.listenUDP(port, NotifyFactory())
 print "Broadcast server listening on %s" % port
 reactor.run()
